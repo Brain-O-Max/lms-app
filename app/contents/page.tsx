@@ -3,7 +3,6 @@
 import DashboardLayout from '@/components/DashboardLayout';
 import Modal from '@/components/Modal';
 import { useAuth } from '@/lib/auth-context';
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 interface ModuleData {
@@ -80,39 +79,79 @@ export default function ContentsPage() {
           <div className="text-muted" style={{ textAlign: 'center', padding: 'var(--space-2xl)' }}>⏳ Loading modules...</div>
         ) : (
           <div className="modules-grid">
-            {modules.map((mod) => (
-              <div key={mod.id} className={`module-card ${mod.completed ? 'completed' : ''}`}>
-                <div className="module-thumbnail" onClick={() => setSelectedModule(mod)}>
-                  {mod.thumbnail ? (
-                    <Image src={mod.thumbnail} alt={mod.title} width={300} height={180} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
-                  ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--gray-100)', fontSize: 'var(--text-3xl)' }}>📚</div>
-                  )}
-                  <span className="module-badge">{mod.type}</span>
-                </div>
-                <div className="module-content">
-                  <h3 className="module-title">{mod.title}</h3>
-                  <p className="module-description">{mod.description}</p>
-                  <div className="module-meta">
-                    <span>⏱️ {mod.duration}</span>
-                    <span>{mod.completed ? '✅ Completed' : '📝 Not Started'}</span>
-                  </div>
-                  <div className="module-actions">
-                    <button className="btn btn-sm btn-primary" onClick={() => setSelectedModule(mod)}>
-                      {mod.completed ? '🔁 Review' : '▶️ Start'}
-                    </button>
-                    {userRole === 'beneficiary' && (
-                      <button
-                        className={`btn btn-sm ${mod.completed ? 'btn-secondary' : 'btn-success'}`}
-                        onClick={() => handleToggleComplete(mod.id, !mod.completed)}
-                      >
-                        {mod.completed ? '↩️ Undo' : '✅ Complete'}
-                      </button>
+            {modules.map((mod, index) => {
+              const thumbnail = mod.thumbnail || 'images/module-placeholder.png';
+              
+              let statusBadge = null;
+              let statusClass = '';
+              let actionBtnClass = 'btn-start';
+              let buttonText = 'Start';
+              
+              if (mod.completed) {
+                statusBadge = <span className="badge badge-success" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', borderRadius: '4px', background: '#dcfce7', color: '#166534', fontWeight: '600' }}>Completed</span>;
+                statusClass = 'completed';
+                actionBtnClass = 'btn-completed';
+                buttonText = 'Review';
+              }
+
+              return (
+                <div key={mod.id} className={`module-card ${statusClass}`} style={{ cursor: 'pointer' }} onClick={() => setSelectedModule(mod)}>
+                  <div className="module-thumbnail-container">
+                    {statusBadge && (
+                      <div className="module-status-badge">
+                        {statusBadge}
+                      </div>
+                    )}
+                    {thumbnail.startsWith('/') || thumbnail.startsWith('http') || thumbnail.startsWith('images') ? (
+                      // We fall back to a standard img tag because next/image requires configuration for external URLs and valid paths
+                      <img src={thumbnail.startsWith('images/') ? `/${thumbnail}` : thumbnail} alt={mod.title} className="module-thumbnail" />
+                    ) : (
+                      <div className="module-thumbnail" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--gray-100)', fontSize: '3rem' }}>📚</div>
                     )}
                   </div>
+                  <div className="module-content">
+                    <div className="module-header">
+                      <span className="module-number">Module {index + 1}</span>
+                      <span className="module-type">{mod.type}</span>
+                    </div>
+                    <h3 className="module-title">{mod.title}</h3>
+                    <p className="module-description">{mod.description}</p>
+                    <div className="module-footer">
+                      <div className="module-duration">
+                        ⏱️ {mod.duration}
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        {userRole === 'beneficiary' && (
+                          <button
+                            className={`module-action-btn ${mod.completed ? 'btn-secondary' : 'btn-success'}`}
+                            style={{ 
+                              padding: '0.4rem 0.8rem', 
+                              borderRadius: 'var(--radius-md)', 
+                              fontSize: 'var(--text-sm)', 
+                              fontWeight: '600', 
+                              border: 'none', 
+                              cursor: 'pointer',
+                              background: mod.completed ? '#e5e7eb' : '#dcfce7',
+                              color: mod.completed ? '#4b5563' : '#166534'
+                            }}
+                            onClick={(e) => { e.stopPropagation(); handleToggleComplete(mod.id, !mod.completed); }}
+                          >
+                            {mod.completed ? '↩️ Undo' : '✅ Complete'}
+                          </button>
+                        )}
+                        <button
+                          className={`module-action-btn ${actionBtnClass}`}
+                          style={{ border: 'none', cursor: 'pointer' }}
+                          onClick={(e) => { e.stopPropagation(); setSelectedModule(mod); }}
+                        >
+                          {buttonText}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
