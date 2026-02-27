@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permissions - LMS Solution</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: var(--shadow-lg);
+            padding: var(--space-md) var(--space-lg);
+            position: sticky;
+            top: 0;
+            z-index: var(--z-sticky);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-md);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            font-family: var(--font-display);
+            font-size: var(--text-xl);
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+
+        .menu-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            font-size: var(--text-2xl);
+            cursor: pointer;
+            padding: var(--space-sm);
+            border-radius: var(--radius-md);
+            transition: background var(--transition-fast);
+            color: white;
+        }
+
+        .menu-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-lg);
+            transition: background var(--transition-fast);
+        }
+
+        .navbar-user:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .user-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: var(--text-lg);
+        }
+
+        .user-info {
+            display: none;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: white;
+            font-size: var(--text-sm);
+        }
+
+        .user-role {
+            font-size: var(--text-xs);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .btn-nav {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-nav:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .sidebar {
+            position: fixed;
+            left: -280px;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            box-shadow: var(--shadow-xl);
+            z-index: var(--z-fixed);
+            transition: left var(--transition-base);
+            overflow-y: auto;
+            padding: var(--space-lg);
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: var(--space-lg) 0;
+            border-bottom: 2px solid var(--gray-100);
+            margin-bottom: var(--space-lg);
+        }
+
+        .sidebar-logo {
+            font-family: var(--font-display);
+            font-size: var(--text-2xl);
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-lg);
+            color: var(--gray-700);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+        }
+
+        .sidebar-link:hover {
+            background: var(--gray-50);
+            color: var(--primary-600);
+            transform: translateX(4px);
+        }
+
+        .sidebar-link.active {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .sidebar-icon {
+            font-size: var(--text-xl);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: var(--space-lg);
+            border-top: 2px solid var(--gray-100);
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-2xl);
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .permission-section {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .permission-section h3 {
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 2px solid var(--gray-100);
+        }
+
+        .permission-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-md) 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .permission-row:last-child {
+            border-bottom: none;
+        }
+
+        .permission-name {
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+
+        .permission-desc {
+            font-size: var(--text-sm);
+            color: var(--gray-500);
+            margin-top: 2px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--gray-300);
+            transition: .3s;
+            border-radius: 26px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked+.toggle-slider {
+            background: var(--gradient-primary);
+        }
+
+        input:checked+.toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .role-selector {
+            background: white;
+            padding: var(--space-md);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        @media (min-width: 640px) {
+            .user-info {
+                display: block;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .sidebar {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 280px;
+            }
+
+            .menu-toggle {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()">☰</button>
+        <a href="landing.html" class="navbar-brand">
+            📚 LMS Solution
+        </a>
+        <div class="navbar-actions">
+            <div class="navbar-user" onclick="window.location.href='profile.html'">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">User</div>
+                    <div class="user-role" id="userRole">Admin</div>
+                </div>
+            </div>
+            <button class="btn btn-sm btn-nav" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">📚 LMS</div>
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav">
+            <!-- Menu items will be populated by JavaScript -->
+        </nav>
+        <div class="sidebar-footer">
+            <button class="btn btn-danger btn-full" onclick="logout()">
+                🚪 Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <div>
+                    <h1>🔑 Role Permissions</h1>
+                    <p class="text-muted">Configure permissions for each role</p>
+                </div>
+                <button class="btn btn-success" onclick="alert('Permissions saved successfully!')">
+                    ✅ Save Changes
+                </button>
+            </div>
+
+            <!-- Role Selector -->
+            <div class="role-selector">
+                <label class="form-label" style="margin-bottom: var(--space-sm);">Select Role to Configure:</label>
+                <select id="roleSelect" class="form-select" onchange="updatePermissionView()" style="max-width: 300px;">
+                    <option value="admin">Administrator</option>
+                    <option value="headoffice">Head Office</option>
+                    <option value="territorymanager">Territory Manager</option>
+                    <option value="unitmanager">Unit Manager</option>
+                    <option value="ro">Regional Officer (RO)</option>
+                    <option value="beneficiary">Beneficiary</option>
+                </select>
+            </div>
+
+            <!-- Content Management Permissions -->
+            <div class="permission-section">
+                <h3>📚 Content Management</h3>
+
+                <div class="permission-row">
+                    <div>
+                        <div class="permission-name">View Courses</div>
+                        <div class="permission-desc">Access and view course content</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="permission-row">
+                    <div>
+                        <div class="permission-name">Create Courses</div>
+                        <div class="permission-desc">Add new courses and modules</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="createContent" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="permission-row">
+                    <div>
+                        <div class="permission-name">Edit Courses</div>
+                        <div class="permission-desc">Modify existing course content</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="editContent" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="permission-row">
+                    <div>
+                        <div class="permission-name">Delete Courses</div>
+                        <div class="permission-desc">Remove courses from the system</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="deleteContent" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Session Management Permissions -->
+            <div class="permission-section">
+                <h3>👥 Session Management</h3>
+
+                <div class="permission-row">
+                    <div>
+                        <div class="permission-name">View Sessions</div>
+                        <div class="permission-desc">Access session list and details</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="permission-row">
+                    <div>
+                        <div class="permission-name">Create Sessions</div>
+                        <div class="permission-desc">Add new training sessions</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="permission-row">
+                    <div>
+                        <div class="permission-name">Edit Sessions</div>
+                        <div class="permission-desc">Modify session details</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="permission-row">
+                    <div>
+                        <div class="permission-name">Delete Sessions</div>
+                        <div class="permission-desc">Remove sessions from the system</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Reports & Analytics Permissions -->
+            <div class="permission-section">
+                <h3>📈 Reports & Analytics</h3>
+
+                <div class="permission-row">
+                    <div>
+                        <div class="permission-name">View Analytics</div>
+                        <div class="permission-desc">Access analytics dashboard</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="permission-row">
+                    <div>
+                        <div class="permission-name">Generate Reports</div>
+                        <div class="permission-desc">Create and download reports</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="permission-row">
+                    <div>
+                        <div class="permission-name">Export Data</div>
+                        <div class="permission-desc">Export data to Excel/CSV</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- User Management Permissions -->
+            <div class="permission-section">
+                <h3>👤 User Management</h3>
+
+                <div class="permission-row">
+                    <div>
+                        <div class="permission-name">View Users</div>
+                        <div class="permission-desc">Access user list</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="permission-row">
+                    <div>
+                        <div class="permission-name">Create Users</div>
+                        <div class="permission-desc">Add new user accounts</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="permission-row">
+                    <div>
+                        <div class="permission-name">Edit Users</div>
+                        <div class="permission-desc">Modify user details</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="permission-row">
+                    <div>
+                        <div class="permission-name">Assign Roles</div>
+                        <div class="permission-desc">Change user role assignments</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        // Check if user is admin
+        const role = getUserRole();
+        if (role !== 'admin') {
+            alert('Access denied. This page is only accessible to administrators.');
+            window.location.href = 'landing.html';
+        }
+
+        // Update user avatar
+        const userName = getUserName();
+        document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
+
+        // Get role from URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedRole = urlParams.get('role');
+        if (selectedRole) {
+            document.getElementById('roleSelect').value = selectedRole;
+        }
+
+        function updatePermissionView() {
+            // In real implementation, this would load permissions from backend
+            const role = document.getElementById('roleSelect').value;
+            console.log('Loading permissions for:', role);
+        }
+    </script>
+</body>
+
+</html>

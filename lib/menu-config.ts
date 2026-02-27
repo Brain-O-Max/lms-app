@@ -1,0 +1,55 @@
+import { MenuItem, UserRole } from './types';
+
+export const menuConfig: Record<UserRole, MenuItem[]> = {
+  admin: [
+    { icon: '🏠', label: 'Home', href: '/' },
+    { icon: '📊', label: 'Analytics', href: '/analytics' },
+    { icon: '📚', label: 'Courses', href: '/courses' },
+    { icon: '📖', label: 'Modules', href: '/contents' },
+    { icon: '📄', label: 'Reports', href: '/reports' },
+    { icon: '🔐', label: 'Roles', href: '/roles' },
+    { icon: '🔑', label: 'Permissions', href: '/permissions' },
+    { icon: '👤', label: 'Users', href: '/users' },
+    { icon: '⚙️', label: 'Settings', href: '/admin-settings' },
+    { icon: '🎓', label: 'Certificate Search', href: '/certificate-search' },
+    { icon: '👤', label: 'Profile', href: '/profile' },
+  ],
+  headoffice: [
+    { icon: '🏠', label: 'Home', href: '/' },
+    { icon: '📊', label: 'Analytics', href: '/analytics' },
+    { icon: '📚', label: 'Courses', href: '/courses' },
+    { icon: '📖', label: 'Modules', href: '/contents' },
+    { icon: '📄', label: 'Reports', href: '/reports' },
+    { icon: '👤', label: 'Profile', href: '/profile' },
+  ],
+  territorymanager: [
+    { icon: '🏠', label: 'Home', href: '/' },
+    { icon: '📊', label: 'Analytics', href: '/analytics' },
+    { icon: '📚', label: 'Courses', href: '/courses' },
+    { icon: '📖', label: 'Modules', href: '/contents' },
+    { icon: '📄', label: 'Reports', href: '/reports' },
+    { icon: '👤', label: 'Profile', href: '/profile' },
+  ],
+  unitmanager: [
+    { icon: '🏠', label: 'Home', href: '/' },
+    { icon: '📊', label: 'Analytics', href: '/analytics' },
+    { icon: '📚', label: 'Courses', href: '/courses' },
+    { icon: '📖', label: 'Modules', href: '/contents' },
+    { icon: '📄', label: 'Reports', href: '/reports' },
+    { icon: '👤', label: 'Profile', href: '/profile' },
+  ],
+  ro: [
+    { icon: '🏠', label: 'Home', href: '/' },
+    { icon: '📊', label: 'Analytics', href: '/analytics' },
+    { icon: '📚', label: 'Courses', href: '/courses' },
+    { icon: '📖', label: 'Modules', href: '/contents' },
+    { icon: '📄', label: 'Reports', href: '/reports' },
+    { icon: '👤', label: 'Profile', href: '/profile' },
+  ],
+  beneficiary: [
+    { icon: '🏠', label: 'Home', href: '/' },
+    { icon: '📚', label: 'My Learning', href: '/contents' },
+    { icon: '📊', label: 'My Progress', href: '/analytics' },
+    { icon: '👤', label: 'Profile', href: '/profile' },
+  ],
+};

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Settings - LMS Solution</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .navbar {
+            background: white;
+            box-shadow: var(--shadow-md);
+            padding: var(--space-md) var(--space-lg);
+            position: sticky;
+            top: 0;
+            z-index: var(--z-sticky);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-md);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            font-family: var(--font-display);
+            font-size: var(--text-xl);
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: var(--text-2xl);
+            cursor: pointer;
+            padding: var(--space-sm);
+            border-radius: var(--radius-md);
+            transition: background var(--transition-fast);
+        }
+
+        .menu-toggle:hover {
+            background: var(--gray-100);
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-lg);
+            transition: background var(--transition-fast);
+        }
+
+        .navbar-user:hover {
+            background: var(--gray-50);
+        }
+
+        .user-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: var(--text-lg);
+        }
+
+        .user-info {
+            display: none;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--gray-800);
+            font-size: var(--text-sm);
+        }
+
+        .user-role {
+            font-size: var(--text-xs);
+            color: var(--gray-500);
+        }
+
+        .sidebar {
+            position: fixed;
+            left: -280px;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            box-shadow: var(--shadow-xl);
+            z-index: var(--z-fixed);
+            transition: left var(--transition-base);
+            overflow-y: auto;
+            padding: var(--space-lg);
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: var(--space-lg) 0;
+            border-bottom: 2px solid var(--gray-100);
+            margin-bottom: var(--space-lg);
+        }
+
+        .sidebar-logo {
+            font-family: var(--font-display);
+            font-size: var(--text-2xl);
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-lg);
+            color: var(--gray-700);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+        }
+
+        .sidebar-link:hover {
+            background: var(--gray-50);
+            color: var(--primary-600);
+            transform: translateX(4px);
+        }
+
+        .sidebar-link.active {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .sidebar-icon {
+            font-size: var(--text-xl);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: var(--space-lg);
+            border-top: 2px solid var(--gray-100);
+        }
+
+        .settings-section {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .settings-section h3 {
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 2px solid var(--gray-100);
+        }
+
+        @media (min-width: 640px) {
+            .user-info {
+                display: block;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .sidebar {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 280px;
+            }
+
+            .menu-toggle {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()">☰</button>
+        <a href="index.html" class="navbar-brand">
+            📚 LMS Solution
+        </a>
+        <div class="navbar-actions">
+            <div class="navbar-user" onclick="window.location.href='profile.html'">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">User</div>
+                    <div class="user-role" id="userRole">Admin</div>
+                </div>
+            </div>
+            <button class="btn btn-sm btn-secondary" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">📚 LMS</div>
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav">
+            <!-- Menu items will be populated by JavaScript -->
+        </nav>
+        <div class="sidebar-footer">
+            <button class="btn btn-danger btn-full" onclick="logout()">
+                🚪 Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div style="margin-bottom: var(--space-2xl);">
+                <h1>⚙️ Admin Settings</h1>
+                <p class="text-muted">Manage system configurations and settings</p>
+            </div>
+
+            <!-- Content Configuration -->
+            <div class="settings-section">
+                <h3>📚 Content Configuration</h3>
+                <p class="text-muted" style="margin-bottom: var(--space-lg);">Manage course modules and learning content
+                </p>
+
+                <div class="alert alert-info" style="margin-bottom: var(--space-lg);">
+                    <strong>ℹ️ Note:</strong> Content management features will be fully implemented in the backend with
+                    .NET Core and PostgreSQL.
+                </div>
+
+                <div class="grid grid-cols-1 grid-md-2 gap-lg">
+                    <button class="btn btn-primary btn-lg"
+                        onclick="alert('Module upload will be implemented in backend')">
+                        ➕ Upload New Module
+                    </button>
+                    <button class="btn btn-secondary btn-lg"
+                        onclick="alert('Module management will be implemented in backend')">
+                        📝 Manage Modules
+                    </button>
+                    <button class="btn btn-secondary btn-lg"
+                        onclick="alert('Module ordering will be implemented in backend')">
+                        🔄 Reorder Modules
+                    </button>
+                    <button class="btn btn-secondary btn-lg"
+                        onclick="alert('Module settings will be implemented in backend')">
+                        ⚙️ Module Settings
+                    </button>
+                </div>
+            </div>
+
+            <!-- User Management -->
+            <div class="settings-section">
+                <h3>👥 User Management</h3>
+                <p class="text-muted" style="margin-bottom: var(--space-lg);">Manage users and assign roles</p>
+
+                <div class="table-wrapper">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Admin User</td>
+                                <td>admin@lms.com</td>
+                                <td><span class="badge badge-error">Admin</span></td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary"
+                                        onclick="alert('User edit will be implemented in backend')">Edit</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Head Office User</td>
+                                <td>ho@lms.com</td>
+                                <td><span class="badge badge-warning">Head Office</span></td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary"
+                                        onclick="alert('User edit will be implemented in backend')">Edit</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Beneficiary User</td>
+                                <td>beneficiary@lms.com</td>
+                                <td><span class="badge badge-primary">Beneficiary</span></td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary"
+                                        onclick="alert('User edit will be implemented in backend')">Edit</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <button class="btn btn-primary" style="margin-top: var(--space-lg);"
+                    onclick="alert('Add user will be implemented in backend')">
+                    ➕ Add New User
+                </button>
+            </div>
+
+            <!-- Geo-location Data -->
+            <div class="settings-section">
+                <h3>🗺️ Geo-location Data Management</h3>
+                <p class="text-muted" style="margin-bottom: var(--space-lg);">Manage districts, upazilas, and unions</p>
+
+                <div class="grid grid-cols-1 grid-md-3 gap-md">
+                    <div class="card">
+                        <h4>Districts</h4>
+                        <p class="text-muted">8 Districts</p>
+                        <button class="btn btn-secondary btn-full"
+                            onclick="alert('District management will be implemented in backend')">
+                            Manage
+                        </button>
+                    </div>
+                    <div class="card">
+                        <h4>Upazilas</h4>
+                        <p class="text-muted">Multiple Upazilas</p>
+                        <button class="btn btn-secondary btn-full"
+                            onclick="alert('Upazila management will be implemented in backend')">
+                            Manage
+                        </button>
+                    </div>
+                    <div class="card">
+                        <h4>Unions</h4>
+                        <p class="text-muted">Multiple Unions</p>
+                        <button class="btn btn-secondary btn-full"
+                            onclick="alert('Union management will be implemented in backend')">
+                            Manage
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unit Office Management -->
+            <div class="settings-section">
+                <h3>🏢 Unit Office Management</h3>
+                <p class="text-muted" style="margin-bottom: var(--space-lg);">Manage unit offices and assignments</p>
+
+                <div class="table-wrapper">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Office Name</th>
+                                <th>District</th>
+                                <th>Unit Manager</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Dhaka Central</td>
+                                <td>Dhaka</td>
+                                <td>Karim Rahman</td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary"
+                                        onclick="alert('Office edit will be implemented in backend')">Edit</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Chittagong South</td>
+                                <td>Chittagong</td>
+                                <td>Fatima Begum</td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary"
+                                        onclick="alert('Office edit will be implemented in backend')">Edit</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <button class="btn btn-primary" style="margin-top: var(--space-lg);"
+                    onclick="alert('Add office will be implemented in backend')">
+                    ➕ Add New Office
+                </button>
+            </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        // Check if user is admin
+        const role = getUserRole();
+        if (role !== 'admin') {
+            alert('Access denied. This page is only accessible to administrators.');
+            window.location.href = 'index.html';
+        }
+
+        // Update user avatar
+        const userName = getUserName();
+        document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
+    </script>
+</body>
+
+</html>
