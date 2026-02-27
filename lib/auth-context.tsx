@@ -1,7 +1,6 @@
 'use client';
 
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { demoUsers } from './demo-data';
 import { AuthContextType, UserRole } from './types';
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -15,34 +14,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setMounted(true);
-    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    if (loggedIn) {
+    // Check if user is authenticated via API
+    fetch('/api/auth/me')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user) {
+          setIsLoggedIn(true);
+          setUserRole(data.user.role as UserRole);
+          setUserName(data.user.name);
+          setUserEmail(data.user.email || data.user.mobile);
+        }
+      })
+      .catch(() => {
+        // Not authenticated
+      });
+  }, []);
+
+  const login = useCallback(async (mobile: string, password: string): Promise<boolean> => {
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile, password }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) return false;
+
       setIsLoggedIn(true);
-      setUserRole((localStorage.getItem('userRole') as UserRole) || 'beneficiary');
-      setUserName(localStorage.getItem('userName') || 'User');
-      setUserEmail(localStorage.getItem('userEmail') || '');
+      setUserRole(data.user.role as UserRole);
+      setUserName(data.user.name);
+      setUserEmail(data.user.email || data.user.mobile);
+      return true;
+    } catch {
+      return false;
     }
   }, []);
 
-  const login = useCallback((email: string, _password: string): boolean => {
-    const userInfo = demoUsers[email.trim()];
-    if (!userInfo) return false;
-
-    localStorage.setItem('userRole', userInfo.role);
-    localStorage.setItem('userEmail', email);
-    localStorage.setItem('userMobile', email);
-    localStorage.setItem('userName', userInfo.name);
-    localStorage.setItem('isLoggedIn', 'true');
-
-    setIsLoggedIn(true);
-    setUserRole(userInfo.role);
-    setUserName(userInfo.name);
-    setUserEmail(email);
-    return true;
-  }, []);
-
-  const logout = useCallback(() => {
-    localStorage.clear();
+  const logout = useCallback(async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
     setIsLoggedIn(false);
     setUserRole('beneficiary');
     setUserName('User');
@@ -50,8 +60,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const switchRole = useCallback((role: UserRole) => {
-    localStorage.setItem('userRole', role);
-    localStorage.setItem('userName', role.charAt(0).toUpperCase() + role.slice(1));
     setUserRole(role);
     setUserName(role.charAt(0).toUpperCase() + role.slice(1));
   }, []);

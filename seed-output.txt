@@ -1,0 +1,65 @@
+﻿node.exe : Loaded Prisma config from prisma.config.ts.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" 
+"C:\Users\kawsa\AppData\Roaming\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Loaded Prisma 
+    c...isma.config.ts.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+Running seed command `npx tsx --no-warnings prisma/seed.ts` ...
+D:\Exam-Projects\LMS\lms-app\node_modules\@prisma\client\sr
+c\runtime\getPrismaClient.ts:260
+        throw new PrismaClientInitializationError(
+              ^
+
+PrismaClientInitializationError: `PrismaClient` needs to 
+be constructed with a non-empty, valid 
+`PrismaClientOptions`:
+
+```
+new PrismaClient({
+  ...
+})
+```
+
+or
+
+```
+constructor() {
+  super({ ... });
+}
+```
+          
+    at new t (D:\Exam-Projects\LMS\lms-app\node_modules\@pr
+isma\client\src\runtime\getPrismaClient.ts:260:15)
+    at bcrypt 
+(D:\Exam-Projects\LMS\lms-app\prisma\seed.ts:5:16)
+    at Object.<anonymous> 
+(D:\Exam-Projects\LMS\lms-app\prisma\seed.ts:262:4)
+    at Module._compile 
+(node:internal/modules/cjs/loader:1761:14)
+    at Object.transformer (D:\Exam-Projects\LMS\lms-app\nod
+e_modules\tsx\dist\register-D46fvsV_.cjs:3:1104)
+    at Module.load 
+(node:internal/modules/cjs/loader:1481:32)
+    at Module._load 
+(node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync 
+(node:diagnostics_channel:328:14)
+    at wrapModuleLoad 
+(node:internal/modules/cjs/loader:245:24)
+    at loadCJSModuleWithModuleLoad 
+(node:internal/modules/esm/translators:336:3) {
+  clientVersion: '7.4.1',
+  errorCode: undefined,
+  retryable: undefined
+}
+
+Node.js v24.11.1
+
+An error occurred while running the seed command:
+Error: Command failed with exit code 1: npx tsx 
+--no-warnings prisma/seed.ts

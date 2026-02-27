@@ -2,53 +2,59 @@
 
 import DashboardLayout from '@/components/DashboardLayout';
 import { useAuth } from '@/lib/auth-context';
-import { demoModules } from '@/lib/demo-data';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+
+interface DashboardStats {
+  type: string;
+  stats: Record<string, number>;
+}
 
 export default function DashboardPage() {
   const { userRole, userName } = useAuth();
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const getModuleProgress = () => {
-    if (typeof window === 'undefined') return {};
-    const progress = localStorage.getItem('moduleProgress');
-    return progress ? JSON.parse(progress) : {};
-  };
+  useEffect(() => {
+    fetch('/api/dashboard/stats')
+      .then((res) => res.json())
+      .then((data) => { setStats(data); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
 
-  const progress = getModuleProgress();
-  const completedModules = Object.values(progress).filter((v) => v === true).length;
-  const totalModules = demoModules.length;
-  const completionPercentage = totalModules === 0 ? 0 : Math.round((completedModules / totalModules) * 100);
+  const s = stats?.stats || {};
 
   return (
     <DashboardLayout navVariant="white">
-
       <div className="container">
         <h1>Welcome to Your Dashboard</h1>
         <p className="text-muted">Track your learning progress and manage your activities</p>
 
         {/* Stats Grid */}
         <div className="stats-grid">
-          {userRole === 'beneficiary' ? (
+          {loading ? (
+            <div className="stat-card"><div className="stat-label">Loading...</div></div>
+          ) : userRole === 'beneficiary' ? (
             <>
               <div className="stat-card">
                 <div className="stat-header"><div className="stat-icon">📚</div></div>
                 <div className="stat-label">Total Modules</div>
-                <div className="stat-value">{totalModules}</div>
+                <div className="stat-value">{s.totalModules ?? 0}</div>
               </div>
               <div className="stat-card success">
                 <div className="stat-header"><div className="stat-icon success">✅</div></div>
                 <div className="stat-label">Completed</div>
-                <div className="stat-value">{completedModules}</div>
+                <div className="stat-value">{s.completedModules ?? 0}</div>
               </div>
               <div className="stat-card warning">
                 <div className="stat-header"><div className="stat-icon warning">⏳</div></div>
                 <div className="stat-label">In Progress</div>
-                <div className="stat-value">{totalModules - completedModules}</div>
+                <div className="stat-value">{s.inProgress ?? 0}</div>
               </div>
               <div className="stat-card info">
                 <div className="stat-header"><div className="stat-icon info">📊</div></div>
                 <div className="stat-label">Progress</div>
-                <div className="stat-value">{completionPercentage}%</div>
+                <div className="stat-value">{s.completionPercentage ?? 0}%</div>
               </div>
             </>
           ) : (
@@ -56,25 +62,22 @@ export default function DashboardPage() {
               <div className="stat-card">
                 <div className="stat-header"><div className="stat-icon">👥</div></div>
                 <div className="stat-label">Total Beneficiaries</div>
-                <div className="stat-value">1,248</div>
-                <div className="stat-change">↑ 12% this month</div>
+                <div className="stat-value">{s.totalBeneficiaries?.toLocaleString() ?? 0}</div>
               </div>
               <div className="stat-card success">
                 <div className="stat-header"><div className="stat-icon success">✅</div></div>
                 <div className="stat-label">Completed Courses</div>
-                <div className="stat-value">856</div>
-                <div className="stat-change">↑ 8% this month</div>
+                <div className="stat-value">{s.completedCourses?.toLocaleString() ?? 0}</div>
               </div>
               <div className="stat-card warning">
                 <div className="stat-header"><div className="stat-icon warning">📅</div></div>
                 <div className="stat-label">Active Sessions</div>
-                <div className="stat-value">24</div>
+                <div className="stat-value">{s.activeSessions ?? 0}</div>
               </div>
               <div className="stat-card info">
                 <div className="stat-header"><div className="stat-icon info">🎓</div></div>
                 <div className="stat-label">Certificates Issued</div>
-                <div className="stat-value">742</div>
-                <div className="stat-change">↑ 15% this month</div>
+                <div className="stat-value">{s.certificatesIssued?.toLocaleString() ?? 0}</div>
               </div>
             </>
           )}
@@ -93,12 +96,6 @@ export default function DashboardPage() {
                 <div className="action-icon">👤</div>
                 <div className="action-content"><h4>My Profile</h4><p>Update your information</p></div>
               </Link>
-              {completionPercentage === 100 && (
-                <Link href="/contents#certificate" className="action-btn">
-                  <div className="action-icon">🎓</div>
-                  <div className="action-content"><h4>Get Certificate</h4><p>Download your certificate</p></div>
-                </Link>
-              )}
             </>
           ) : (
             <>

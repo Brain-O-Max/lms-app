@@ -8,8 +8,10 @@ import { useEffect, useState } from 'react';
 export default function LoginPage() {
   const { isLoggedIn, login } = useAuth();
   const router = useRouter();
-  const [email, setEmail] = useState('');
+  const [mobile, setMobile] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -17,11 +19,15 @@ export default function LoginPage() {
     }
   }, [isLoggedIn, router]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = login(email, password);
+    setLoading(true);
+    setError('');
+
+    const success = await login(mobile, password);
     if (!success) {
-      alert('অবৈধ মোবাইল নম্বর। অনুগ্রহ করে নিচের ডেমো নম্বরগুলির একটি ব্যবহার করুন।');
+      setError('Invalid mobile number or password. Please try again.');
+      setLoading(false);
       return;
     }
     router.push('/');
@@ -42,21 +48,27 @@ export default function LoginPage() {
               <p>Sign in to continue your learning journey</p>
             </div>
 
+            {error && (
+              <div className="alert alert-error" style={{ marginBottom: 'var(--space-lg)' }}>
+                ⚠️ {error}
+              </div>
+            )}
+
             <form onSubmit={handleLogin}>
               <div className="form-group">
-                <label className="form-label form-label-required" htmlFor="email">
+                <label className="form-label form-label-required" htmlFor="mobile">
                   মোবাইল নম্বর (User ID)
                 </label>
                 <div className="form-input-icon">
                   <span className="icon">📱</span>
                   <input
                     type="tel"
-                    id="email"
+                    id="mobile"
                     className="form-input"
                     placeholder="01XXXXXXXXX"
                     required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={mobile}
+                    onChange={(e) => setMobile(e.target.value)}
                   />
                 </div>
               </div>
@@ -91,8 +103,8 @@ export default function LoginPage() {
                 </a>
               </div>
 
-              <button type="submit" className="btn btn-primary btn-lg btn-full">
-                Sign In
+              <button type="submit" className="btn btn-primary btn-lg btn-full" disabled={loading}>
+                {loading ? '⏳ Signing in...' : 'Sign In'}
               </button>
             </form>
 
@@ -116,7 +128,7 @@ export default function LoginPage() {
               }}
             >
               <p style={{ fontWeight: 700, marginBottom: 'var(--space-sm)', color: 'var(--gray-900)' }}>
-                🔑 ডেমো লগইন (যেকোনো পাসওয়ার্ড):
+                🔑 ডেমো লগইন (পাসওয়ার্ড: password123):
               </p>
               <div style={{ fontSize: 'var(--text-sm)', color: 'var(--gray-700)', lineHeight: 1.8 }}>
                 <div><strong>Admin:</strong> 01700000001</div>

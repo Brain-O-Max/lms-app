@@ -54,7 +54,7 @@ export interface AuthContextType {
   userRole: UserRole;
   userName: string;
   userEmail: string;
-  login: (email: string, password: string) => boolean;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   switchRole: (role: UserRole) => void;
 }

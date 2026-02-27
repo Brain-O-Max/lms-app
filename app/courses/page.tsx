@@ -3,38 +3,61 @@
 import DashboardLayout from '@/components/DashboardLayout';
 import Modal from '@/components/Modal';
 import { useAuth } from '@/lib/auth-context';
-import { demoCourses } from '@/lib/demo-data';
-import { Course } from '@/lib/types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+interface Course {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  duration: string;
+  modules: number;
+  icon: string;
+  gradient: string;
+}
 
 export default function CoursesPage() {
   const { userRole } = useAuth();
-  const [courses, setCourses] = useState<Course[]>(demoCourses);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
-  const handleAddCourse = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetch('/api/courses')
+      .then((res) => res.json())
+      .then((data) => { setCourses(data.courses || []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const handleAddCourse = async (e: React.FormEvent) => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
-    const newCourse: Course = {
-      id: courses.length + 1,
-      title: formData.get('courseTitle') as string,
-      description: formData.get('courseDescription') as string,
-      category: formData.get('courseCategory') as string,
-      duration: formData.get('courseDuration') as string,
-      modules: parseInt(formData.get('moduleCount') as string),
-      icon: '📘',
-      gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-    };
-    setCourses([...courses, newCourse]);
-    setShowModal(false);
-    form.reset();
-    alert('Course created successfully! 🎉');
+
+    const res = await fetch('/api/courses', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: formData.get('courseTitle'),
+        description: formData.get('courseDescription'),
+        category: formData.get('courseCategory'),
+        duration: formData.get('courseDuration'),
+        moduleCount: formData.get('moduleCount'),
+      }),
+    });
+
+    if (res.ok) {
+      setShowModal(false);
+      form.reset();
+      // Refresh courses
+      const data = await fetch('/api/courses').then((r) => r.json());
+      setCourses(data.courses || []);
+      alert('Course created successfully! 🎉');
+    }
   };
 
   return (
     <DashboardLayout navVariant="gradient">
-
       <div className="container">
         <div className="page-header">
           <div>
@@ -48,28 +71,32 @@ export default function CoursesPage() {
           )}
         </div>
 
-        <div className="courses-grid">
-          {courses.map((course) => (
-            <div key={course.id} className="course-card" onClick={() => window.location.href = `/contents?courseId=${course.id}`}>
-              <div className="course-thumbnail" style={{ background: course.gradient }}>
-                {course.icon}
-                <span className="course-category">{course.category}</span>
-              </div>
-              <div className="course-content">
-                <div className="course-title">{course.title}</div>
-                <div className="course-description">{course.description}</div>
-                <div className="course-meta">
-                  <div className="course-meta-item">⏱️ {course.duration}</div>
-                  <div className="course-meta-item">📚 {course.modules} Modules</div>
+        {loading ? (
+          <div className="text-muted" style={{ textAlign: 'center', padding: 'var(--space-2xl)' }}>⏳ Loading courses...</div>
+        ) : (
+          <div className="courses-grid">
+            {courses.map((course) => (
+              <div key={course.id} className="course-card" onClick={() => window.location.href = `/contents?courseId=${course.id}`}>
+                <div className="course-thumbnail" style={{ background: course.gradient }}>
+                  {course.icon}
+                  <span className="course-category">{course.category}</span>
                 </div>
-                <div className="course-footer">
-                  <span className="course-modules">View Modules →</span>
-                  <button className="btn btn-sm btn-primary">Start</button>
+                <div className="course-content">
+                  <div className="course-title">{course.title}</div>
+                  <div className="course-description">{course.description}</div>
+                  <div className="course-meta">
+                    <div className="course-meta-item">⏱️ {course.duration}</div>
+                    <div className="course-meta-item">📚 {course.modules} Modules</div>
+                  </div>
+                  <div className="course-footer">
+                    <span className="course-modules">View Modules →</span>
+                    <button className="btn btn-sm btn-primary">Start</button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Add New Course" size="lg"

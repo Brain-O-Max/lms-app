@@ -1,0 +1,151 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?  @unique
+  mobile    String   @unique
+  password  String
+  roleId    String
+  district  String?
+  status    String   @default("Active")
+  gender    String?
+  dob       DateTime?
+  nid       String?
+  phone     String?
+
+  // Household details
+  familyMembers      Int?
+  monthlyIncome      Int?
+  relationToMigrant  String?
+  primaryEarnings    String?
+
+  // Migration & Financial details
+  migrantCountry     String?
+  yearsAbroad        Int?
+  monthlyRemittance  Int?
+  bankAccountUsage   Boolean?
+  insuranceCoverage  Boolean?
+  digitalAppUsage    Boolean?
+
+  lastLogin DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  role      Role           @relation(fields: [roleId], references: [id])
+  progress  UserProgress[]
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  accessLevel String   @default("basic")
+  icon        String?
+  badge       String?
+  badgeCls    String?
+  cardCls     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users       User[]
+  permissions Permission[]
+}
+
+model Permission {
+  id        String  @id @default(cuid())
+  module    String
+  canView   Boolean @default(false)
+  canCreate Boolean @default(false)
+  canEdit   Boolean @default(false)
+  canDelete Boolean @default(false)
+  roleId    String
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, module])
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  category    String?
+  duration    String?
+  icon        String   @default("📘")
+  gradient    String   @default("linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  modules Module[]
+}
+
+model Module {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  duration    String?
+  videoUrl    String?
+  thumbnail   String?
+  type        String   @default("Video Lesson")
+  sortOrder   Int      @default(0)
+  courseId     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  course   Course?        @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  progress UserProgress[]
+}
+
+model UserProgress {
+  id          String    @id @default(cuid())
+  userId      String
+  moduleId    String
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, moduleId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  name         String
+  date         DateTime
+  district     String
+  upazila      String?
+  unionName    String?
+  unitOffice   String?
+  participants Int      @default(0)
+  male         Int      @default(0)
+  female       Int      @default(0)
+  unitManager  String?
+  status       String   @default("Scheduled")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model District {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  upazilas  Upazila[]
+}
+
+model Upazila {
+  id         String   @id @default(cuid())
+  name       String
+  districtId String
+
+  district District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+
+  @@unique([districtId, name])
+}
